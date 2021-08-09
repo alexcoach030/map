@@ -31,8 +31,9 @@ export default {
     addRussia() {
       this.text = "pending";
       //Получаем данные GeoJSON по ссылке
-      fetch(this.url/*{mode: 'no-cors',}*/)
-          .then((response) => response.json())
+      fetch(this.url, {headers: {'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',}, mode: 'no-cors'})
+          .then((response) => {return response.json();})
           .then((data) => {
             this.data = Object.assign({}, data);
             //Метод для добавление новых данных
@@ -41,10 +42,10 @@ export default {
             this.countDistance(this.data);
             //вывод данных
             this.text = "distance =" + this.distance.toFixed(2) + "m";
-          })
-          .catch((error) => {
-            console.log(error);
           });
+/*          .catch((error) => {
+            console.log('error');
+          });*/
     },
     createMapInstance() {
       this.map = L.map(this.$refs.mapContainer, {
