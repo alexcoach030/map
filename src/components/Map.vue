@@ -1,7 +1,7 @@
 <template>
   <div>
     <p v-if="!calculated">Производим расчеты...</p>
-    <p v-if="calculated">Общая дистанция: {{ distance.toFixed(2) }}</p>
+    <p v-if="calculated">Общая дистанция: {{ distance.toFixed(2) }} метров</p>
     <h3>Main map</h3>
     <div ref="mapContainer" class="l-map"></div>
   </div>
@@ -11,11 +11,12 @@
 //Для карты использовал vue-plugin leaflet
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import geo from "../../geo.json"
 export default {
   data() {
     return {
       text: "Add RUSSIA",
-      data: null,
+      data: Object.assign({}, geo),
       map: null,
       mapLayer: null,
       url: "https://waadsu.com/api/russia.geo.json",
@@ -29,7 +30,6 @@ export default {
   },
   methods: {
     addRussia() {
-      this.text = "pending";
       //Получаем данные GeoJSON по ссылке
       fetch(this.url, {headers: {'Access-Control-Allow-Origin': '*',
           'Content-Type': 'application/json',}, mode: 'no-cors'})
@@ -42,10 +42,10 @@ export default {
             this.countDistance(this.data);
             //вывод данных
             this.text = "distance =" + this.distance.toFixed(2) + "m";
+          })
+          .catch((error) => {
+            console.log(error);
           });
-/*          .catch((error) => {
-            console.log('error');
-          });*/
     },
     createMapInstance() {
       this.map = L.map(this.$refs.mapContainer, {
@@ -113,7 +113,13 @@ export default {
   // Монтируем при запуске приложения карту и маршрут
   mounted() {
     this.createMapInstance();
-    this.addRussia();
+    /*this.addRussia();*///Закомментированный метод фетча, поскольку cors теперь на сервере не дает работать
+    this.addGeoJson(this.data);
+    //Метод для подсчета дистанции
+    this.countDistance(this.data);
+    //вывод данных
+    this.text = "distance =" + this.distance.toFixed(2) + "m";
+    this.calculated = true;
   },
 };
 </script>
